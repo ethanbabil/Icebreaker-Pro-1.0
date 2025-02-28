@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IceBreaker Pro</title>
+    <style>
+        :root {
+            --primary-bg: #1E1E2E;
+            --secondary-bg: #282A36;
+            --button-bg: #44475A;
+            --selected-bg: #BD93F9;
+            --generate-bg: #FF79C6;
+            --disabled-bg: #555566;
+            --text-color: #F8F8F2;
+            --hint-color: #6272A4;
+            --border-color: #38384D;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .option-button {
+            background-color: var(--button-bg);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            color: var(--text-color);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option-button.selected {
+            background-color: var(--selected-bg);
+            font-weight: bold;
+        }
+        
+        .generate-button {
+            background-color: var(--generate-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: background-color 0.2s;
+        }
+        
+        .generate-button:disabled {
+            background-color: var(--disabled-bg);
+            cursor: not-allowed;
+        }
+        
+        .loader {
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--text-color);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .response-container {
+            background-color: var(--secondary-bg);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .response-text {
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .placeholder svg {
+            margin-bottom: 20px;
+            color: var(--hint-color);
+        }
+        
+        .placeholder-text {
+            color: var(--hint-color);
+            font-size: 16px;
+        }
+        
+        /* For iPhone notch compatibility */
+        .safe-area-top {
+            height: env(safe-area-inset-top, 0);
+            background-color: var(--primary-bg);
+        }
+        
+        .safe-area-bottom {
+            height: env(safe-area-inset-bottom, 0);
+            background-color: var(--primary-bg);
+        }
+    </style>
+</head>
+<body>
+    <div class="safe-area-top"></div>
+    <div class="container">
+        <header>
+            <h1>IceBreaker Pro</h1>
+        </header>
+        
+        <div class="section">
+            <div class="section-title">Select Location</div>
+            <div class="options-container" id="locations">
+                <button class="option-button" data-value="Library">Library</button>
+                <button class="option-button" data-value="Gym">Gym</button>
+                <button class="option-button" data-value="Bookstore">Bookstore</button>
+                <button class="option-button" data-value="Coffee Shop">Coffee Shop</button>
+                <button class="option-button" data-value="Bar">Bar</button>
+                <button class="option-button" data-value="Club">Club</button>
+                <button class="option-button" data-value="Museum">Museum</button>
+                <button class="option-button" data-value="Park">Park</button>
+                <button class="option-button" data-value="Beach">Beach</button>
+                <button class="option-button" data-value="Art Gallery">Art Gallery</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Select Style</div>
+            <div class="options-container" id="styles">
+                <button class="option-button" data-value="Casual">Casual</button>
+                <button class="option-button" data-value="Direct">Direct</button>
+                <button class="option-button" data-value="Witty">Witty</button>
+                <button class="option-button" data-value="Smooth">Smooth</button>
+                <button class="option-button" data-value="Comedic">Comedic</button>
+                <button class="option-button" data-value="Intellectual">Intellectual</button>
+                <button class="option-button" data-value="Friendly">Friendly</button>
+                <button class="option-button" data-value="Playful">Playful</button>
+                <button class="option-button" data-value="Charming">Charming</button>
+                <button class="option-button" data-value="Mysterious">Mysterious</button>
+            </div>
+        </div>
+        
+        <button id="generate-button" class="generate-button" disabled>
+            <span id="button-text">Charm Away!</span>
+            <div id="loader" class="loader"></div>
+        </button>
+        
+        <div class="response-container" id="response-container">
+            <div class="placeholder" id="placeholder">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <div class="placeholder-text">
+                    Pick your spot and style, then get the perfect opening line!
+                </div>
+            </div>
+            <div class="response-text" id="response-text"></div>
+        </div>
+    </div>
+    <div class="safe-area-bottom"></div>
+
+    <script>
+        // Variables to store selections
+        let selectedLocation = null;
+        let selectedStyle = null;
+        
+        // Get DOM elements
+        const locationButtons = document.querySelectorAll('#locations .option-button');
+        const styleButtons = document.querySelectorAll('#styles .option-button');
+        const generateButton = document.getElementById('generate-button');
+        const buttonText = document.getElementById('button-text');
+        const loader = document.getElementById('loader');
+        const responseContainer = document.getElementById('response-container');
+        const placeholder = document.getElementById('placeholder');
+        const responseText = document.getElementById('response-text');
+        
+        // Add event listeners to location buttons
+        locationButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove selected class from all location buttons
+                locationButtons.forEach(b => b.classList.remove('selected'));
+                // Add selected class to clicked button
+                button.classList.add('selected');
+                // Update selected location
+                selectedLocation = button.getAttribute('data-value');
+                // Update generate button state
+                updateGenerateButtonState();
+            });
+        });
+        
+        // Add event listeners to style buttons
+        styleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove selected class from all style buttons
+                styleButtons.forEach(b => b.classList.remove('selected'));
+                // Add selected class to clicked button
+                button.classList.add('selected');
+                // Update selected style
+                selectedStyle = button.getAttribute('data-value');
+                // Update generate button state
+                updateGenerateButtonState();
+            });
+        });
+        
+        // Update generate button state
+        function updateGenerateButtonState() {
+            if (selectedLocation && selectedStyle) {
+                generateButton.disabled = false;
+            } else {
+                generateButton.disabled = true;
+            }
+        }
+        
+        // Handle generate button click
+        generateButton.addEventListener('click', generateResponse);
+        
+        // Generate response function
+        function generateResponse() {
+            // Show loading state
+            buttonText.style.display = 'none';
+            loader.style.display = 'block';
+            generateButton.disabled = true;
+            
+            // Hide placeholder and clear previous response
+            placeholder.style.display = 'none';
+            responseText.style.display = 'block';
+            
+            // Simulate API call delay (since we're not actually calling the API in this demo)
+            setTimeout(() => {
+                // Generate conversation starter based on selected location and style
+                const response = generateConversationStarter(selectedLocation, selectedStyle);
+                
+                // Display response
+                responseText.textContent = response;
+                
+                // Reset button state
+                buttonText.style.display = 'block';
+                loader.style.display = 'none';
+                generateButton.disabled = false;
+            }, 1000);
+        }
+        
+        // Function to generate conversation starters based on location and style
+        function generateConversationStarter(location, style) {
+            // This is where you would normally call the Anthropic API
+            // For demo purposes, we'll use pre-defined responses based on location and style
+            
+            const starters = {
+                "Library": {
+                    "Casual": "Hey, I noticed the book you're reading. I've been looking for something new to read - would you recommend it?",
+                    "Direct": "Hi there. I'm [your name]. I'm interested in getting to know you. Would you like to chat for a bit?",
+                    "Witty": "Is it just me, or does this library have a strict 'no fun' policy? I think we should stage a quiet rebellion. I'm [your name], by the way.",
+                    "Smooth": "I believe some of the best stories aren't found on these shelves, but in conversations with interesting people. I'm [your name].",
+                    "Comedic": "Do you know where I can find books on overcoming shyness? Asking for a friend... who is also me. Hi, I'm [your name]!",
+                    "Intellectual": "I see you're in the [subject] section. I've been exploring [related topic] recently. Have you read anything that's changed your perspective on it?",
+                    "Friendly": "Hi! I'm looking for book recommendations and you seem like someone with good taste. Any suggestions?",
+                    "Playful": "I have a theory that you can tell a lot about someone from their library choices. What do you think your current read says about you?",
+                    "Charming": "I couldn't help but notice you among all these books. I'd love to hear about what draws you to this section.",
+                    "Mysterious": "I've been watching you browse for a while... the books, I mean. Your choices are intriguing. What are you searching for?"
+                },
+                "Gym": {
+                    "Casual": "Hey, I'm trying to improve my [exercise] form. You look like you know what you're doing - any quick tips?",
+                    "Direct": "Hi, I've seen you here a few times and wanted to introduce myself. I'm [your name].",
+                    "Witty": "If workouts were graded, yours would definitely get an A. Mind if I copy some notes from your routine?",
+                    "Smooth": "They say the best workout partners are found by chance. I think we might just prove that theory right.",
+                    "Comedic": "I'm trying to decide if my burning sensation is muscle growth or just my body begging me to stop. Any wisdom to share on the subject?",
+                    "Intellectual": "I've been researching optimal recovery techniques between strength sessions. Have you found any approaches particularly effective?",
+                    "Friendly": "Hi there! Great form on those [exercises]. I'm [your name], pretty new here. Would you mind if I asked you a couple of questions about your routine?",
+                    "Playful": "I'll bet you five burpees I can guess which muscle group you're focusing on today.",
+                    "Charming": "You make working out look effortless. I'd love to learn your approach to fitness sometime.",
+                    "Mysterious": "I've noticed your dedication here. There's clearly more to your discipline than meets the eye."
+                }
+            };
+            
+            // Handle other locations not explicitly defined
+            if (!starters[location]) {
+                const genericResponses = {
+                    "Casual": `Hey, I love coming to this ${location.toLowerCase()}. What brought you here today?`,
+                    "Direct": `Hi, I'm [your name]. I noticed you and wanted to introduce myself. Would you like some company?`,
+                    "Witty": `Is it just me, or does this ${location.toLowerCase()} have the perfect atmosphere for meeting interesting people?`,
+                    "Smooth": `I believe that sometimes the universe puts two people in the same ${location.toLowerCase()} for a reason.`,
+                    "Comedic": `I'm supposed to be meeting a friend at this ${location.toLowerCase()}, but I think I've found someone more intriguing to talk to.`,
+                    "Intellectual": `I've been contemplating the social dynamics of ${location.toLowerCase()}s lately. They create such unique spaces for human connection, don't you think?`,
+                    "Friendly": `Hi there! Isn't this ${location.toLowerCase()} great? I'm [your name]. Mind if I join you for a bit?`,
+                    "Playful": `I have a challenge for you: give me three reasons why this ${location.toLowerCase()} is your favorite spot in town.`,
+                    "Charming": `Something told me I should come to this ${location.toLowerCase()} today. Now I see it was to meet you.`,
+                    "Mysterious": `I've been observing this ${location.toLowerCase()} for some time. You seem to appreciate it in the same way I do.`
+                };
+                
+                return genericResponses[style] || `Hey, I noticed you at this ${location.toLowerCase()} and thought I'd say hello. I'm [your name].`;
+            }
+            
+            // Return the starter for the specified location and style, or a fallback
+            return starters[location][style] || 
+                   `Hey, I noticed you at this ${location.toLowerCase()} and thought I'd say hello. I'm [your name].`;
+        }
+    </script>
+</body>
+</html>
